@@ -1,4 +1,4 @@
-# node-sqlserver
+# node-jsonrequest
 
 A simple wrapper for Node's built-in Request API. This wrapper makes it simple to use JSON endpoints by providing a Promise API that encodes and decodes JSON requests and responses and also supports compressed server responses. It also supports binary or non-JSON responses and passes the buffer back directly if they are encountered.
 
