@@ -18,7 +18,5 @@
 		"url": "https://github.com/unidyne/node-jsonrequest/issues"
 	},
 	"homepage": "https://github.com/unidyne/node-jsonrequest#readme",
-	"dependencies": {
-		"tedious": "^6.1.1"
-	}
+	"dependencies": { }
 }
