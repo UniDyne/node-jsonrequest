@@ -1,22 +1,23 @@
 {
-	"name": "node-sqlserver",
-	"version": "0.1.2",
-	"description": "A wrapper for Tedious.",
+	"name": "node-jsonwrapper",
+	"version": "0.1.0",
+	"description": "A wrapper for Request.",
 	"main": "main.js",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/unidyne/node-sqlserver.git"
+		"url": "git+https://github.com/unidyne/node-jsonrequest.git"
 	},
 	"keywords": [
-		"SQL",
-		"Tedious"
+		"JSON",
+		"Request",
+		"REST"
 	],
 	"author": "D. Oliver Brown <unidyne AT gmail.com>",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/unidyne/node-sqlserver/issues"
+		"url": "https://github.com/unidyne/node-jsonrequest/issues"
 	},
-	"homepage": "https://github.com/unidyne/node-sqlserver#readme",
+	"homepage": "https://github.com/unidyne/node-jsonrequest#readme",
 	"dependencies": {
 		"tedious": "^6.1.1"
 	}
