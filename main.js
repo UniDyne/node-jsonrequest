@@ -30,10 +30,10 @@ module.exports = function(options) {
 	};
 	
 	// set Content-Length
-	if(jsonString) options.headers['Content-Length'] = Buffer.from(jsonString).length;
+	if(jsonString) requestOptions.headers['Content-Length'] = Buffer.from(jsonString).length;
 	
 	return new Promise((resolve, reject) => {
-		const req = https.request(options, res => {
+		const req = https.request(requestOptions, res => {
 			const contentEncoding = res.headers['content-encoding'];
 			const compressed = ['deflate', 'gzip'].indexOf(contentEncoding) !== -1;
 			const encoding = compressed ? 'binary' : 'utf8';

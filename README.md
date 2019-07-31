@@ -34,7 +34,7 @@ console.log(myResultObj);
 
 ```
 
-# Options
+## Options
 The options object parameter supports the following options:
 * `hostname` : Required string. This is the hostname of the server to connect to.
 * `port` : Optional integer. The port number to send request to. Defaults to `443`.
