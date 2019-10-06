@@ -11,6 +11,7 @@ const
 // method : Defaults to 'post' if payload specified, 'get' otherwise.
 // path : Required.
 // payload : Defaults to no payload. Object to be JSON encoded.
+// data: May be used for non-JSON payloads.
 // headers : Optional HTTP headers.
 // port : Defaults to 443
 
@@ -23,7 +24,7 @@ module.exports = function(options) {
 		method: (options.method ||  (jsonString ? 'post' : 'get')).toUpperCase(),
 		port: options.port || 443,
 		headers: Object.assign({
-			'User-Agent': 'node-testing/0.1',
+			'User-Agent': 'node-jsonrequest/0.1',
 			'Content-Type': 'application/json', // JSON payload
 			'Accept-Encoding': 'gzip, deflate' // enable compression
 		}, options.headers)
@@ -31,6 +32,7 @@ module.exports = function(options) {
 	
 	// set Content-Length
 	if(jsonString) requestOptions.headers['Content-Length'] = Buffer.from(jsonString).length;
+	else if(options.data) requestOptions.headers['Content-Length'] = Buffer.from(options.data).length;
 	
 	return new Promise((resolve, reject) => {
 		const req = https.request(requestOptions, res => {
@@ -76,9 +78,19 @@ module.exports = function(options) {
 			});
 		});
 		
-		req.on('error', e => {console.log(e);reject(e);});
+		req.on('error', e => {
+			console.log(`\x1b[31;1mJSONRequest: ${e}\x1b[0m`);
+			
+			// catch a socket disconnect and simply re-run the request
+			if((""+e).indexOf("socket disconnected") > -1)
+				return setTimeout(() => {
+					module.exports(options).then(resolve).catch(reject);
+				}, 500);
+			else return reject(e);
+		});
 		
 		if(jsonString) req.write(jsonString);
+		else if(options.data) req.write(options.data);
 		
 		req.end();
 	});
