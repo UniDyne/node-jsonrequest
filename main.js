@@ -47,10 +47,9 @@ module.exports = function(options) {
 			// request limit reached
 			if(res.statusCode == 429) {
 				const timeToWait = res.headers['x-retry-after'];
-				
+				//console.log('Restarting request call after suggested time');
+
 				return setTimeout(() => {
-					logger('Restarting request call after suggested time');
-		
 					this.run(options)
 					  .then(resolve)
 					  .catch(reject);
@@ -67,11 +66,25 @@ module.exports = function(options) {
 					
 				if(compressed) {
 					const unzip = contentEncoding === 'deflate' ? zlib.deflate : zlib.gunzip;
-					return unzip(Buffer.from(body, encoding), (err, data) => {
-						if(err) return reject(err);
-						
-						return parseResponse(res, data.toString('utf8'), resolve, reject);
-					});
+					
+					// response may be incomplete buffer
+					// wrapping in try
+					try {
+						return unzip(Buffer.from(body, encoding), (err, data) => {
+							if(err) return reject(err);
+							
+							return parseResponse(res, data.toString('utf8'), resolve, reject);
+						});
+					} catch(err) {
+						// malformed response - retry for now
+						// this needs to be an option
+						//console.log('Malformed response. Restarting request.');
+						return setTimeout(() => {
+							module.exports(options)
+							.then(resolve)
+							.catch(reject);
+						}, 100);
+					}
 				}
 				
 				return parseResponse(res, body, resolve, reject);
@@ -79,7 +92,7 @@ module.exports = function(options) {
 		});
 		
 		req.on('error', e => {
-			console.log(`\x1b[31;1mJSONRequest: ${e}\x1b[0m`);
+			//console.log(`\x1b[31;1mJSONRequest: ${e}\x1b[0m`);
 			
 			// catch a socket disconnect and simply re-run the request
 			if((""+e).indexOf("socket disconnected") > -1)
