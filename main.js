@@ -63,14 +63,17 @@ module.exports = function(options) {
 				
 				//if(res.statusCode >= 400 && res.statusCode <= 600)
 				//	return reject(res.statusCode);
-					
+				
+				// don't bother reading response
+				if(options.nodata) return resolve(null);
+
 				if(compressed) {
 					const unzip = contentEncoding === 'deflate' ? zlib.deflate : zlib.gunzip;
 					
 					// response may be incomplete buffer
 					// wrapping in try
 					try {
-						return unzip(Buffer.from(body, encoding), (err, data) => {
+						return unzip(Buffer.from(body, encoding), {finishFlush: zlib.constants.Z_SYNC_FLUSH}, (err, data) => {
 							if(err) return reject(err);
 							
 							return parseResponse(res, data.toString('utf8'), resolve, reject);
@@ -115,12 +118,17 @@ function parseResponse(res, body, resolve, reject) {
 		if (!/application\/(problem\+)?json/.test(res.headers['content-type']) || body.trim() === '')
 			return resolve(body);
 		
-		const data = JSON.parse(body);
+		var data = null;
 		
+		try { data = JSON.parse(body); } catch(e) { console.log(e); }
+		
+		if(res.statusCode >= 400)
+			return reject(data);
+
 		// if an error or error collection returned, reject
 		//if(data.error || data.errors)
-		if(data.status >= 400)
-			return reject(data);//.error || data.errors);
+		//if(data.status >= 400)
+		//	return reject(data);//.error || data.errors);
 		
 		// return the parsed JSON
 		return resolve(data);
